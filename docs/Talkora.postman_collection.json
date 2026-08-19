@@ -1,0 +1,174 @@
+{
+  "info": {
+    "name": "Talkora Backend",
+    "_postman_id": "3f1a2b3c-4d5e-4a6b-9c7d-talkora000001",
+    "description": "Talkora backend API — auth, curriculum, progress, achievements, AI (Miss Julie), voice.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "schoolToken", "value": "" },
+    { "key": "teacherToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "schoolCode", "value": "DEMO001" },
+    { "key": "schoolPassword", "value": "talkora123" },
+    { "key": "teacherEmail", "value": "teacher@demo.talkora.dev" },
+    { "key": "teacherPassword", "value": "teacher123" },
+    { "key": "studentId", "value": "" },
+    { "key": "studentCode", "value": "" },
+    { "key": "activityId", "value": "" },
+    { "key": "classId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "School login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/school/login",
+            "body": { "mode": "raw", "raw": "{\n  \"schoolCode\": \"{{schoolCode}}\",\n  \"password\": \"{{schoolPassword}}\"\n}" }
+          }
+        },
+        {
+          "name": "Teacher login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/teacher/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{teacherEmail}}\",\n  \"password\": \"{{teacherPassword}}\"\n}" }
+          }
+        },
+        {
+          "name": "Student school lookup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/student/school",
+            "body": { "mode": "raw", "raw": "{\n  \"schoolCode\": \"{{schoolCode}}\"\n}" }
+          }
+        },
+        {
+          "name": "Student login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/student/login",
+            "body": { "mode": "raw", "raw": "{\n  \"schoolCode\": \"{{schoolCode}}\",\n  \"studentId\": \"{{studentId}}\",\n  \"studentCode\": \"{{studentCode}}\"\n}" }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students (school/teacher)",
+      "item": [
+        {
+          "name": "List students",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{schoolToken}}" }],
+            "url": "{{baseUrl}}/students?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Create student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{schoolToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/students",
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"New Student\",\n  \"rollNumber\": \"99\",\n  \"grade\": 4,\n  \"className\": \"4A\"\n}" }
+          }
+        },
+        {
+          "name": "Update student",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{schoolToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/students/:id",
+            "body": { "mode": "raw", "raw": "{\n  \"className\": \"4B\"\n}" }
+          }
+        },
+        {
+          "name": "Deactivate student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{schoolToken}}" }],
+            "url": "{{baseUrl}}/students/:id/deactivate"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Curriculum",
+      "item": [
+        { "name": "List classes", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/classes" } },
+        { "name": "List levels for class", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/classes/{{classId}}/levels" } },
+        { "name": "List lessons for level", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/levels/:levelId/lessons" } },
+        { "name": "List activities for lesson", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/lessons/:lessonId/activities" } }
+      ]
+    },
+    {
+      "name": "Progress",
+      "item": [
+        {
+          "name": "Submit activity attempt",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/progress/activities/{{activityId}}/attempts",
+            "body": { "mode": "raw", "raw": "{\n  \"answer\": \"CAT\",\n  \"startedAt\": \"2026-01-01T00:00:00.000Z\",\n  \"hintsUsed\": 0\n}" }
+          }
+        },
+        {
+          "name": "Get progress for class",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/progress/classes/{{classId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Achievements",
+      "item": [
+        { "name": "My achievements", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/achievements/mine" } }
+      ]
+    },
+    {
+      "name": "AI (Miss Julie)",
+      "item": [
+        {
+          "name": "Talk to Miss Julie",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/ai/miss-julie",
+            "body": { "mode": "raw", "raw": "{\n  \"message\": \"I don't understand this word\",\n  \"context\": \"hint\"\n}" }
+          }
+        },
+        { "name": "Recommendation", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/ai/recommendation" } }
+      ]
+    },
+    {
+      "name": "Voice",
+      "item": [
+        {
+          "name": "Start voice session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/voice/sessions",
+            "body": { "mode": "raw", "raw": "{}" }
+          }
+        }
+      ]
+    }
+  ]
+}
